@@ -1,4 +1,4 @@
-# CS123Final
+# CS123 Final Project
 
 Jinwoo Choi,
 Allison Yeh,
