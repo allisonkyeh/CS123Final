@@ -12,6 +12,8 @@
 #include "gl/shaders/ShaderAttribLocations.h"
 #include "sphere.h"
 
+#define PI 3.14159265f
+
 using namespace CS123::GL;
 
 GLWidget::GLWidget(QGLFormat format, QWidget *parent)
@@ -95,6 +97,31 @@ void GLWidget::initializeGL() {
     GLint maxRenderBufferSize;
     glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE_EXT, &maxRenderBufferSize);
     std::cout << "Max FBO size: " << maxRenderBufferSize << std::endl;
+
+    /*********** TERRAIN ***********/
+    ResourceLoader::initializeGlew();
+    resizeGL(width(), height());
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+
+    // Set the color to set the screen when the color buffer is cleared.
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+    m_program = ResourceLoader::createShaderProgram(":/shaders/shader.vert", ":/shaders/shader.frag");
+
+    std::vector<glm::vec3> data = m_terrain.init();
+    glPolygonMode(GL_FRONT_AND_BACK, m_terrain.isFilledIn() ? GL_FILL : GL_LINE);
+    // Initialize openGLShape.
+    m_terrain.openGLShape = std::make_unique<OpenGLShape>();
+    m_terrain.openGLShape->setVertexData(&data[0][0], data.size() * 3, VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP, 2 * data.size());
+    m_terrain.openGLShape->setAttribute(ShaderAttrib::POSITION, 3, 0, VBOAttribMarker::DATA_TYPE::FLOAT, false);
+    m_terrain.openGLShape->setAttribute(ShaderAttrib::NORMAL, 3, sizeof(glm::vec3), VBOAttribMarker::DATA_TYPE::FLOAT, false);
+    m_terrain.openGLShape->buildVAO();
+
+    rebuildMatrices();
+
+    /*********** ENDDDD ***********/
 }
 
 void GLWidget::paintGL() {
@@ -108,6 +135,25 @@ void GLWidget::paintGL() {
         update();
         break;
     }
+
+    /*********** TERRAIN ***********/
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Bind shader program.
+    glUseProgram(m_program);
+
+    // Set uniforms.
+    glUniformMatrix4fv(glGetUniformLocation(m_program, "model"), 1, GL_FALSE, glm::value_ptr(m_model));
+    glUniformMatrix4fv(glGetUniformLocation(m_program, "view"), 1, GL_FALSE, glm::value_ptr(m_view));
+    glUniformMatrix4fv(glGetUniformLocation(m_program, "projection"), 1, GL_FALSE, glm::value_ptr(m_projection));
+
+    // Draw terrain.
+    m_terrain.draw();
+
+    // Unbind shader program.
+    glUseProgram(0);
+    /*********** ENDDDD ***********/
+
 }
 
 void GLWidget::drawBlur() {
@@ -228,6 +274,10 @@ void GLWidget::resizeGL(int w, int h) {
     m_blurFBO2 = std::make_unique<FBO>(1, FBO::DEPTH_STENCIL_ATTACHMENT::NONE, w, h, TextureParameters::WRAP_METHOD::CLAMP_TO_EDGE);
     //       [Task 12] Pass in TextureParameters::WRAP_METHOD::CLAMP_TO_EDGE as the last parameter
 
+    //terrain
+    glViewport(0, 0, w, h);
+
+    //end
     rebuildMatrices();
 }
 
@@ -259,6 +309,8 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 }
 
 void GLWidget::rebuildMatrices() {
+    m_model = glm::mat4(1.f);
+
     m_view = glm::translate(glm::vec3(0, 0, -m_zoom)) *
             glm::rotate(m_angleY, glm::vec3(1,0,0)) *
             glm::rotate(m_angleX, glm::vec3(0,1,0));

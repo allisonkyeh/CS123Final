@@ -12,6 +12,14 @@
 
 #include "gl/datatype/FBO.h"
 
+// terrain
+#ifdef __APPLE__
+#include <glu.h>
+#else
+#include <GL/glu.h>
+#endif
+#include "terrain.h"
+
 class OpenGLShape;
 
 using namespace CS123::GL;
@@ -61,11 +69,18 @@ private:
     bool m_evenPass;
     int m_numParticles;
 
-    glm::mat4 m_view, m_projection;
+    glm::mat4 m_model, m_view, m_projection;
+
+    /** ID for the shader program. */
+    GLuint m_program;
+
+    Terrain m_terrain;
 
     /** For mouse interaction. */
     float m_angleX, m_angleY, m_zoom;
     QPoint m_prevMousePos;
+
+
 };
 
 #endif // GLWIDGET_H

@@ -45,7 +45,8 @@ SOURCES += \
     src/gl/GLDebug.cpp \
     src/databinding.cpp \
     src/settings.cpp \
-    ../glew-1.10.0/src/glew.c
+    ../glew-1.10.0/src/glew.c \
+    src/terrain.cpp
 
 
 HEADERS += \
@@ -70,7 +71,8 @@ HEADERS += \
     cs123_lib/sphere.h \
     src/databinding.h \
     src/settings.h \
-    ../glew-1.10.0/include/GL/glew.h
+    ../glew-1.10.0/include/GL/glew.h \
+    src/terrain.h
 
 FORMS += src/mainwindow.ui
 
@@ -87,3 +89,7 @@ OTHER_FILES += \
 
 RESOURCES += \
     shaders/shaders.qrc
+
+DISTFILES += \
+    shaders/shader.frag \
+    shaders/shader.vert
