@@ -102,7 +102,7 @@ void checkShaderCompilationStatus(GLuint shaderID) {
         std::vector<GLchar> errorLog(maxLength);
         glGetShaderInfoLog(shaderID, maxLength, &maxLength, &errorLog[0]);
 
-        std::cerr << &errorLog[0] << std::endl;
+        std::cerr << &errorLog[ 0 ] << std::endl;
     } else {
         std::cerr << "Shader compiled." << std::endl;
     }
