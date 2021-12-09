@@ -21,8 +21,8 @@ win32 {
 
 DEFINES += GLM_FORCE_RADIANS
 
-INCLUDEPATH += src cs123_lib glm ../glew-1.10.0/include
-DEPENDPATH += src cs123_lib glm ../glew-1.10.0/include
+INCLUDEPATH += src cs123_lib glm glew-1.10.0/include
+DEPENDPATH += src cs123_lib glm glew-1.10.0/include
 
 SOURCES += \
     src/mainwindow.cpp \
@@ -45,7 +45,7 @@ SOURCES += \
     src/gl/GLDebug.cpp \
     src/databinding.cpp \
     src/settings.cpp \
-    ../glew-1.10.0/src/glew.c \
+    glew-1.10.0/src/glew.c \
     src/terrain.cpp
 
 
@@ -71,7 +71,7 @@ HEADERS += \
     cs123_lib/sphere.h \
     src/databinding.h \
     src/settings.h \
-    ../glew-1.10.0/include/GL/glew.h \
+    glew-1.10.0/include/GL/glew.h \
     src/terrain.h
 
 FORMS += src/mainwindow.ui
