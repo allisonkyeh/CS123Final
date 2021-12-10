@@ -24,7 +24,10 @@ GLWidget::GLWidget(QGLFormat format, QWidget *parent)
       m_blurFBO1(nullptr), m_blurFBO2(nullptr),
       m_particlesFBO1(nullptr), m_particlesFBO2(nullptr),
       m_firstPass(true), m_evenPass(true), m_numParticles(5000),
+      // particles
       m_angleX(-0.5f), m_angleY(0.5f), m_zoom(4.f)
+      // end
+//      m_angleX(0), m_angleY(0.5f), m_zoom(10.f)
 {
 }
 
@@ -53,6 +56,10 @@ void GLWidget::initializeGL() {
                 ":/shaders/quad.vert", ":/shaders/particles_update.frag");
     m_particleDrawProgram = ResourceLoader::createShaderProgram(
                 ":/shaders/particles_draw.vert", ":/shaders/particles_draw.frag");
+
+    // TERRAIN
+    m_program = ResourceLoader::createShaderProgram(":/shaders/shader.vert", ":/shaders/shader.frag");
+    // ENDDD
 
     // Initialize sphere OpenGLShape.
     std::vector<GLfloat> sphereData = SPHERE_VERTEX_POSITIONS;

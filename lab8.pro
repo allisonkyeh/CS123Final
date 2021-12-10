@@ -85,11 +85,9 @@ OTHER_FILES += \
     shaders/quad.vert \
     shaders/particles_update.frag \
     shaders/particles_draw.frag \
-    shaders/particles_draw.vert
+    shaders/particles_draw.vert \
+    shaders/shader.frag \
+    shaders/shader.vert
 
 RESOURCES += \
     shaders/shaders.qrc
-
-DISTFILES += \
-    shaders/shader.frag \
-    shaders/shader.vert
