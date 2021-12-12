@@ -103,7 +103,32 @@ void main() {
     vec4 anchorPoint = vec4(posTime.xyz, 1.0);
 
     // Center the particle around anchorPoint
-//    gl_Position = anchorPoint + triPos - diameter * vec4(0.5, 0.5, 0.0, 0.0);
-    gl_Position = projection * view * model * (anchorPoint + triPos - diameter * vec4(0.5, 0.5, 0.0, 0.0));
+    //    gl_Position = anchorPoint + triPos - diameter * vec4(0.5, 0.5, 0.0, 0.0);
+
+    //////////// Billboarding attempt 1:
+
+//    vec3 cameraRightWorldspace(view[0][0], view[1][0], view[2][0]);
+//    vec3 cameraUpWorldspace(view[0][1], view[1][1], view[2][1]);
+
+//    gl_Position = projection * view * model * (anchorPoint + triPos - diameter * vec4(0.5, 0.5, 0.0, 0.0));
+//    gl_Position = gl_Position + cameraRightWorldspace * triPos.x * diameter + cameraUpWorldspace * triPos.y * diameter;
+//    gl_Position = projection * gl_Position;
+
+    //////////// Billboarding attempt 2:
+
+    mat4 modelView = view * model;
+    modelView[0][0] = 1.0;
+    modelView[0][1] = 0.0;
+    modelView[0][2] = 0.0;
+
+    modelView[1][0] = 0.0;
+    modelView[1][1] = 1.0;
+    modelView[1][2] = 0.0;
+
+    modelView[2][0] = 0.0;
+    modelView[2][1] = 0.0;
+    modelView[2][2] = 1.0;
+
+    gl_Position = projection * modelView * (anchorPoint + triPos - diameter * vec4(0.5, 0.5, 0.0, 0.0));
 }
 
