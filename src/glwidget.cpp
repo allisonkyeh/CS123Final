@@ -25,9 +25,9 @@ GLWidget::GLWidget(QGLFormat format, QWidget *parent)
       m_particlesFBO1(nullptr), m_particlesFBO2(nullptr),
       m_firstPass(true), m_evenPass(true), m_numParticles(5000),
       // particles
-      m_angleX(-0.5f), m_angleY(0.5f), m_zoom(4.f)
+//      m_angleX(-0.5f), m_angleY(0.5f), m_zoom(4.f)
       // end
-//      m_angleX(0), m_angleY(0.5f), m_zoom(10.f)
+      m_angleX(0), m_angleY(0.5f), m_zoom(10.f)
 {
 }
 
@@ -251,6 +251,13 @@ void GLWidget::drawParticles() {
     glActiveTexture(GL_TEXTURE1);
     nextFBO->getColorAttachment(1).bind();
 
+
+    GLint modelLoc = glGetUniformLocation(m_particleDrawProgram, "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &m_model[0][0]);
+    GLint viewLoc = glGetUniformLocation(m_particleDrawProgram, "view");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &m_view[0][0]);
+    GLint projectionLoc = glGetUniformLocation(m_particleDrawProgram, "projection");
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &m_projection[0][0]);
 
     GLint posLoc = glGetUniformLocation(m_particleDrawProgram, "pos");
     glUniform1i(posLoc, 0);

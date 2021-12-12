@@ -1,5 +1,9 @@
 #version 330 core
 
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
 uniform sampler2D pos;
 uniform sampler2D vel;
 uniform int numParticles;
@@ -99,6 +103,7 @@ void main() {
     vec4 anchorPoint = vec4(posTime.xyz, 1.0);
 
     // Center the particle around anchorPoint
-    gl_Position = anchorPoint + triPos - diameter * vec4(0.5, 0.5, 0.0, 0.0);
+//    gl_Position = anchorPoint + triPos - diameter * vec4(0.5, 0.5, 0.0, 0.0);
+    gl_Position = projection * view * model * (anchorPoint + triPos - diameter * vec4(0.5, 0.5, 0.0, 0.0));
 }
 
