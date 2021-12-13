@@ -17,7 +17,7 @@ const vec4 TRI_VERTS[NUM_VERTICES_PER_PARTICLE] = vec4[NUM_VERTICES_PER_PARTICLE
         // TODO [Task 18] Calculate the triangle point offsets (see diagram in handout)
 
             vec4(0, 2, 0, 0),
-            vec4(0, 0, 0, 0),
+            vec4(0, 0, 2, 0),
             vec4(2, 0, 0, 0)
             );
 

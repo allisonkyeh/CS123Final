@@ -15,6 +15,26 @@ Terrain::Terrain() : m_numRows(100), m_numCols(m_numRows), m_isFilledIn(true)
  */
 float Terrain::randValue(int row, int col)
 {
+
+    if (row >= 40 && row <= 60) {
+        if (col >= 40 && col <= 45) {
+            return .2;
+        }
+    }
+
+    if (row >= 40 && row <= 60) {
+        if (col >= 45 && col <= 55) {
+            return 1;
+        }
+    }
+
+
+    if (row >= 40 && row <= 60) {
+        if (col >= 55 && col <= 60) {
+            return .2;
+        }
+    }
+
     return -1.0 + 2.0 * glm::fract(sin(row * 127.1f + col * 311.7f) * 43758.5453123f);
 }
 
@@ -36,17 +56,63 @@ glm::vec3 Terrain::getPosition(int row, int col)
         float new_row = float(row)/scale * i;
         float new_col = float(col)/scale * i;
 
-        float a = randValue(glm::floor(new_row), glm::floor(new_col));
-        float b = randValue(glm::floor(new_row), glm::floor(new_col) + 1);
-        float c = randValue(glm::floor(new_row) + 1, glm::floor(new_col));
-        float d = randValue(glm::floor(new_row) + 1, glm::floor(new_col) + 1);
+        float a = randValue(glm::floor(new_row), glm::floor(new_col)) / 2;
+        float b = randValue(glm::floor(new_row), glm::floor(new_col) + 1) /2;
+        float c = randValue(glm::floor(new_row) + 1, glm::floor(new_col))/2;
+        float d = randValue(glm::floor(new_row) + 1, glm::floor(new_col) + 1)/2;
 
         float y = glm::fract(new_row);
         float x = glm::fract(new_col);
+
+//        if (row >= 40 && row <= 60) {
+//            if (col >= 40 && col <= 45) {
+//                a /= 2;
+//                b /= 2;
+//                c /= 2;
+//                d /= 2;
+//            }
+//        }
+
+//        if (row >= 40 && row <= 60) {
+//            if (col >= 45 && col <= 55) {
+//                a /= 3;
+//                b /= 3;
+//                c /= 3;
+//                d /= 3;
+//            }
+//        }
+
+
+//        if (row >= 40 && row <= 60) {
+//            if (col >= 55 && col <= 60) {
+//                a /= 2;
+//                b /= 2;
+//                c /= 2;
+//                d /= 2;
+//            }
+//        }
+
+//        if (row >= 40 && row <= 60) {
+//            if (col >= 40 && col <= 60) {
+//                position.y = glm::mix(a, b, x);
+////                a= 2;
+////                b=2;
+////                c=2;
+////                d=2;
+//            }
+//        }
+
         position.y += glm::mix(glm::mix(a,b,3*x*x-2*x*x*x),glm::mix(c,d,3*x*x-2*x*x*x), 3*y*y-2*y*y*y) / pow(2,i-1);
     }
 
 
+
+
+//    float d = std::sqrt((center-row)*(center-row) + (center-col)*(center-col));
+//                // linear dropoff function
+//                float linear = (r-d) / r;
+//                if (d<r) {
+//                    m_mask[row * maskW + col] = linear;
 
     return position;
 }
@@ -108,6 +174,12 @@ std::vector<glm::vec3> Terrain::init() {
         data[index++] = getPosition(row + 1, m_numCols - 1);
         data[index++] = getNormal  (row + 1, m_numCols - 1);
     }
+
+//    for (int row = m_numRows / 2 - 5; row < m_numRows / 2 + 5; row++) {
+//        for (int col = m_numCols / 2 - 5; col < m_numCols / 2 + 5; col++) {
+//            data[index++] =
+//        }
+//    }
 
     return data;
 }
