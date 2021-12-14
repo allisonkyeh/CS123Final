@@ -4,7 +4,7 @@
 #include "gl/shaders/ShaderAttribLocations.h"
 #include "iostream"
 
-Terrain::Terrain() : m_numRows(100), m_numCols(m_numRows), m_isFilledIn(true)
+Terrain::Terrain() : m_numRows(100), m_numCols(m_numRows), m_isFilledIn(true), m_rock_image(":/images/rocky.jpg")
 {
 }
 
@@ -64,43 +64,43 @@ glm::vec3 Terrain::getPosition(int row, int col)
         float y = glm::fract(new_row);
         float x = glm::fract(new_col);
 
-//        if (row >= 40 && row <= 60) {
-//            if (col >= 40 && col <= 45) {
-//                a /= 2;
-//                b /= 2;
-//                c /= 2;
-//                d /= 2;
-//            }
-//        }
+        //        if (row >= 40 && row <= 60) {
+        //            if (col >= 40 && col <= 45) {
+        //                a /= 2;
+        //                b /= 2;
+        //                c /= 2;
+        //                d /= 2;
+        //            }
+        //        }
 
-//        if (row >= 40 && row <= 60) {
-//            if (col >= 45 && col <= 55) {
-//                a /= 3;
-//                b /= 3;
-//                c /= 3;
-//                d /= 3;
-//            }
-//        }
+        //        if (row >= 40 && row <= 60) {
+        //            if (col >= 45 && col <= 55) {
+        //                a /= 3;
+        //                b /= 3;
+        //                c /= 3;
+        //                d /= 3;
+        //            }
+        //        }
 
 
-//        if (row >= 40 && row <= 60) {
-//            if (col >= 55 && col <= 60) {
-//                a /= 2;
-//                b /= 2;
-//                c /= 2;
-//                d /= 2;
-//            }
-//        }
+        //        if (row >= 40 && row <= 60) {
+        //            if (col >= 55 && col <= 60) {
+        //                a /= 2;
+        //                b /= 2;
+        //                c /= 2;
+        //                d /= 2;
+        //            }
+        //        }
 
-//        if (row >= 40 && row <= 60) {
-//            if (col >= 40 && col <= 60) {
-//                position.y = glm::mix(a, b, x);
-////                a= 2;
-////                b=2;
-////                c=2;
-////                d=2;
-//            }
-//        }
+        //        if (row >= 40 && row <= 60) {
+        //            if (col >= 40 && col <= 60) {
+        //                position.y = glm::mix(a, b, x);
+        ////                a= 2;
+        ////                b=2;
+        ////                c=2;
+        ////                d=2;
+        //            }
+        //        }
 
         position.y += glm::mix(glm::mix(a,b,3*x*x-2*x*x*x),glm::mix(c,d,3*x*x-2*x*x*x), 3*y*y-2*y*y*y) / pow(2,i-1);
     }
@@ -108,11 +108,11 @@ glm::vec3 Terrain::getPosition(int row, int col)
 
 
 
-//    float d = std::sqrt((center-row)*(center-row) + (center-col)*(center-col));
-//                // linear dropoff function
-//                float linear = (r-d) / r;
-//                if (d<r) {
-//                    m_mask[row * maskW + col] = linear;
+    //    float d = std::sqrt((center-row)*(center-row) + (center-col)*(center-col));
+    //                // linear dropoff function
+    //                float linear = (r-d) / r;
+    //                if (d<r) {
+    //                    m_mask[row * maskW + col] = linear;
 
     return position;
 }
@@ -175,11 +175,11 @@ std::vector<glm::vec3> Terrain::init() {
         data[index++] = getNormal  (row + 1, m_numCols - 1);
     }
 
-//    for (int row = m_numRows / 2 - 5; row < m_numRows / 2 + 5; row++) {
-//        for (int col = m_numCols / 2 - 5; col < m_numCols / 2 + 5; col++) {
-//            data[index++] =
-//        }
-//    }
+    //    for (int row = m_numRows / 2 - 5; row < m_numRows / 2 + 5; row++) {
+    //        for (int col = m_numCols / 2 - 5; col < m_numCols / 2 + 5; col++) {
+    //            data[index++] =
+    //        }
+    //    }
 
     return data;
 }
@@ -191,4 +191,20 @@ std::vector<glm::vec3> Terrain::init() {
 void Terrain::draw()
 {
     openGLShape->draw();
+}
+
+void Terrain::addTexture() {
+    // rock texture:
+    glGenTextures(1, &m_rock_textureID);
+    glBindTexture(GL_TEXTURE_2D, m_rock_textureID);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);// repeats and mirrors the tiled texture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_rock_image.width(), m_rock_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_rock_image.bits());
+}
+
+void Terrain::bindTextures() {
+    glActiveTexture(GL_TEXTURE0 + 0); // Texture unit 0
+    glBindTexture(GL_TEXTURE_2D, m_rock_textureID);
 }

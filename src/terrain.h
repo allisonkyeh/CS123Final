@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "openglshape.h"
+#include "QImage"
 
 class Terrain {
 public:
@@ -25,6 +26,12 @@ private:
     glm::vec3 getNormal(int row, int col);
     const float m_numRows, m_numCols;
     const bool m_isFilledIn;
+
+    void addTexture();
+    void bindTextures();
+
+    QImage m_rock_image;
+    GLuint m_rock_textureID;
 };
 
 #endif // TERRAIN_H
