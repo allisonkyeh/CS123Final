@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>ground_image_7.jpg</file>
+        <file>ground_normal_map_7.jpg</file>
+        <file>sky_image_day.jpg</file>
+        <file>sky_image_night.jpg</file>
+        <file>sky_image_sunset.jpg</file>
+        <file>grass_image_2.jpg</file>
+        <file>grass_normal_map_2.jpg</file>
+    </qresource>
+</RCC>

@@ -25,9 +25,12 @@ GLWidget::GLWidget(QGLFormat format, QWidget *parent)
       m_particlesFBO1(nullptr), m_particlesFBO2(nullptr),
       m_firstPass(true), m_evenPass(true), m_numParticles(5000),
       // particles
-//      m_angleX(-0.5f), m_angleY(0.5f), m_zoom(4.f)
+      //      m_angleX(-0.5f), m_angleY(0.5f), m_zoom(4.f)
       // end
-      m_angleX(0), m_angleY(0.5f), m_zoom(10.f)
+      m_angleX(0), m_angleY(0.5f), m_zoom(10.f),
+      mTexture(QOpenGLTexture::TargetCubeMap),
+      mVertexBuf(QOpenGLBuffer::VertexBuffer),
+      mSpeed(0.0f)
 {
 }
 
@@ -93,10 +96,10 @@ void GLWidget::initializeGL() {
     glGenVertexArrays(1, &m_particlesVAO);
     // TODO [Task 13] Create m_particlesFBO1 and 2 with std::make_shared
 
-//    FBO(int numberOfColorAttachments, DEPTH_STENCIL_ATTACHMENT attachmentType, int m_width, int m_height,
-//        TextureParameters::WRAP_METHOD wrapMethod = TextureParameters::WRAP_METHOD::REPEAT,
-//        TextureParameters::FILTER_METHOD filterMethod = TextureParameters::FILTER_METHOD::LINEAR,
-//        GLenum type = GL_UNSIGNED_BYTE);
+    //    FBO(int numberOfColorAttachments, DEPTH_STENCIL_ATTACHMENT attachmentType, int m_width, int m_height,
+    //        TextureParameters::WRAP_METHOD wrapMethod = TextureParameters::WRAP_METHOD::REPEAT,
+    //        TextureParameters::FILTER_METHOD filterMethod = TextureParameters::FILTER_METHOD::LINEAR,
+    //        GLenum type = GL_UNSIGNED_BYTE);
     m_particlesFBO1 = std::make_shared<FBO>(2, FBO::DEPTH_STENCIL_ATTACHMENT::NONE, m_numParticles, 1, TextureParameters::WRAP_METHOD::CLAMP_TO_EDGE, TextureParameters::FILTER_METHOD::NEAREST, GL_FLOAT);
     m_particlesFBO2 = std::make_shared<FBO>(2, FBO::DEPTH_STENCIL_ATTACHMENT::NONE, m_numParticles, 1, TextureParameters::WRAP_METHOD::CLAMP_TO_EDGE, TextureParameters::FILTER_METHOD::NEAREST, GL_FLOAT);
 
@@ -129,6 +132,96 @@ void GLWidget::initializeGL() {
     rebuildMatrices();
 
     /*********** ENDDDD ***********/
+    //    initializeOpenGLFunctions();
+
+    mProgram.addShaderFromSourceCode(
+                QOpenGLShader::Vertex,
+                R"(
+                    attribute vec3 aPosition;
+                    varying vec3 vTexCoord;
+                    uniform mat4 mvpMatrix;
+
+                    void main()
+                    {
+                        gl_Position = mvpMatrix * vec4(aPosition, 1.0);
+                        vTexCoord = aPosition;
+                    }
+                    )");
+
+    mProgram.addShaderFromSourceCode(
+                QOpenGLShader::Fragment,
+                R"(
+                    uniform samplerCube uTexture;
+                    varying vec3 vTexCoord;
+
+                    void main()
+                    {
+                        gl_FragColor = textureCube(uTexture, vTexCoord);
+                    }
+                    )");
+
+    mProgram.link();
+    mProgram.bind();
+
+    loadImages();
+
+    QVector3D vertices[] =
+    {
+        {-1.0f,  1.0f, -1.0f},
+        {-1.0f, -1.0f, -1.0f},
+        {+1.0f, -1.0f, -1.0f},
+        {+1.0f, -1.0f, -1.0f},
+        {+1.0f, +1.0f, -1.0f},
+        {-1.0f, +1.0f, -1.0f},
+
+        {-1.0f, -1.0f, +1.0f},
+        {-1.0f, -1.0f, -1.0f},
+        {-1.0f, +1.0f, -1.0f},
+        {-1.0f, +1.0f, -1.0f},
+        {-1.0f, +1.0f, +1.0f},
+        {-1.0f, -1.0f, +1.0f},
+
+        {+1.0f, -1.0f, -1.0f},
+        {+1.0f, -1.0f, +1.0f},
+        {+1.0f, +1.0f, +1.0f},
+        {+1.0f, +1.0f, +1.0f},
+        {+1.0f, +1.0f, -1.0f},
+        {+1.0f, -1.0f, -1.0f},
+
+        {-1.0f, -1.0f, +1.0f},
+        {-1.0f, +1.0f, +1.0f},
+        {+1.0f, +1.0f, +1.0f},
+        {+1.0f, +1.0f, +1.0f},
+        {+1.0f, -1.0f, +1.0f},
+        {-1.0f, -1.0f, +1.0f},
+
+        {-1.0f, +1.0f, -1.0f},
+        {+1.0f, +1.0f, -1.0f},
+        {+1.0f, +1.0f, +1.0f},
+        {+1.0f, +1.0f, +1.0f},
+        {-1.0f, +1.0f, +1.0f},
+        {-1.0f, +1.0f, -1.0f},
+
+        {-1.0f, -1.0f, -1.0f},
+        {-1.0f, -1.0f, +1.0f},
+        {+1.0f, -1.0f, -1.0f},
+        {+1.0f, -1.0f, -1.0f},
+        {-1.0f, -1.0f, +1.0f},
+        {+1.0f, -1.0f, +1.0f}
+    };
+
+    mVertexBuf.create();
+    mVertexBuf.bind();
+    mVertexBuf.allocate(vertices, 36 * sizeof(QVector3D));
+
+    mProgram.enableAttributeArray("aPosition");
+    mProgram.setAttributeBuffer("aPosition",
+                                GL_FLOAT,
+                                0,
+                                3,
+                                sizeof(QVector3D));
+
+    mProgram.setUniformValue("uTexture", 0);
 }
 
 void GLWidget::paintGL() {
@@ -139,12 +232,12 @@ void GLWidget::paintGL() {
         break;
     case MODE_PARTICLES:
         drawParticles();
-        update();
+        //        update();
         break;
     }
 
     /*********** TERRAIN ***********/
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Bind shader program.
     glUseProgram(m_program);
@@ -162,6 +255,8 @@ void GLWidget::paintGL() {
     // Unbind shader program.
     glUseProgram(0);
     /*********** ENDDDD ***********/
+
+
 
 }
 
@@ -333,5 +428,50 @@ void GLWidget::rebuildMatrices() {
 
     m_projection = glm::perspective(0.8f, (float)width()/height(), 0.1f, 100.f);
     update();
+}
+
+void GLWidget::loadImages()
+{
+    const QImage posx = QImage(":/images/posx.jpg").convertToFormat(QImage::Format_RGBA8888);
+    const QImage negx = QImage(":/images/negx.jpg").convertToFormat(QImage::Format_RGBA8888);
+
+    const QImage posy = QImage(":/images/posy.jpg").convertToFormat(QImage::Format_RGBA8888);
+    const QImage negy = QImage(":/images/negy.jpg").convertToFormat(QImage::Format_RGBA8888);
+
+    const QImage posz = QImage(":/images/posz.jpg").convertToFormat(QImage::Format_RGBA8888);
+    const QImage negz = QImage(":/images/negz.jpg").convertToFormat(QImage::Format_RGBA8888);
+
+    mTexture.create();
+    mTexture.setSize(posx.width(), posx.height(), posx.depth());
+    mTexture.setFormat(QOpenGLTexture::RGBA8_UNorm);
+    mTexture.allocateStorage();
+
+    mTexture.setData(0, 0, QOpenGLTexture::CubeMapPositiveX,
+                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                     posx.constBits(), Q_NULLPTR);
+
+    mTexture.setData(0, 0, QOpenGLTexture::CubeMapPositiveY,
+                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                     posy.constBits(), Q_NULLPTR);
+
+    mTexture.setData(0, 0, QOpenGLTexture::CubeMapPositiveZ,
+                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                     posz.constBits(), Q_NULLPTR);
+
+    mTexture.setData(0, 0, QOpenGLTexture::CubeMapNegativeX,
+                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                     negx.constBits(), Q_NULLPTR);
+
+    mTexture.setData(0, 0, QOpenGLTexture::CubeMapNegativeY,
+                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                     negy.constBits(), Q_NULLPTR);
+
+    mTexture.setData(0, 0, QOpenGLTexture::CubeMapNegativeZ,
+                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                     negz.constBits(), Q_NULLPTR);
+
+    mTexture.setWrapMode(QOpenGLTexture::ClampToEdge);
+    mTexture.setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    mTexture.setMagnificationFilter(QOpenGLTexture::LinearMipMapLinear);
 }
 

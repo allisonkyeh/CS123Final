@@ -30,6 +30,12 @@ struct Settings {
     void saveSettings();
 
     int mode;          // The currently selected mode.
+    QString mFrontImagePath;
+    QString mBackImagePath;
+    QString mTopImagePath;
+    QString mBottomImagePath;
+    QString mLeftImagePath;
+    QString mRightImagePath;
 };
 
 // The global Settings object, will be initialized by MainWindow

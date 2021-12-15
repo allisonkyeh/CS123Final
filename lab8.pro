@@ -91,4 +91,11 @@ OTHER_FILES += \
 
 RESOURCES += \
     shaders/shaders.qrc \
-    images/rocky.jpg
+    images/rocky.jpg \
+    images/posx.jpg \
+    images/negx.jpg \
+    images/posy.jpg \
+    images/negy.jpg \
+    images/posz.jpg \
+    images/negz.jpg \
+

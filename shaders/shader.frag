@@ -11,7 +11,7 @@ uniform sampler2D rock_tex;
 
 void main(){
     vec3 WS_toLight = normalize(vec3(10.0) - WS_position);
-//    fragColor = vec3(0.3 + 0.7 * max(0.0, dot(normalize(WS_normal), WS_toLight)));
+    fragColor = vec3(0.3 + 0.7 * max(0.0, dot(normalize(WS_normal), WS_toLight)));
 
-    fragColor = vec3(texture(rock_tex, uv));
+//    fragColor = vec3(texture(rock_tex, uv));
 }
