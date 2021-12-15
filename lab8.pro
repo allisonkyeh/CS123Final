@@ -90,4 +90,5 @@ OTHER_FILES += \
     shaders/shader.vert
 
 RESOURCES += \
-    shaders/shaders.qrc
+    shaders/shaders.qrc \
+    images/rocky.jpg

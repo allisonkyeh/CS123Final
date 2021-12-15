@@ -30,6 +30,8 @@ private:
     void addTexture();
     void bindTextures();
 
+    glm::vec3 getTextureUV(float row, float col);
+
     QImage m_rock_image;
     GLuint m_rock_textureID;
 };

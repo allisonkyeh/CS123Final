@@ -74,6 +74,7 @@ SOURCES       = src/mainwindow.cpp \
 		src/settings.cpp \
 		glew-1.10.0/src/glew.c \
 		src/terrain.cpp qrc_shaders.cpp \
+		qrc_qmake_qmake_immediate.cpp \
 		moc_mainwindow.cpp \
 		moc_glwidget.cpp \
 		moc_databinding.cpp
@@ -100,6 +101,7 @@ OBJECTS       = mainwindow.o \
 		glew.o \
 		terrain.o \
 		qrc_shaders.o \
+		qrc_qmake_qmake_immediate.o \
 		moc_mainwindow.o \
 		moc_glwidget.o \
 		moc_databinding.o
@@ -525,6 +527,7 @@ Makefile: lab8.pro ../../../Qt/5.14.2/clang_64/mkspecs/macx-clang/qmake.conf ../
 		../../../Qt/5.14.2/clang_64/mkspecs/features/lex.prf \
 		lab8.pro \
 		shaders/shaders.qrc \
+		qmake_qmake_immediate.qrc \
 		../../../Qt/5.14.2/clang_64/lib/QtOpenGL.framework/Resources/QtOpenGL.prl \
 		../../../Qt/5.14.2/clang_64/lib/QtWidgets.framework/Resources/QtWidgets.prl \
 		../../../Qt/5.14.2/clang_64/lib/QtGui.framework/Resources/QtGui.prl \
@@ -709,6 +712,7 @@ Makefile: lab8.pro ../../../Qt/5.14.2/clang_64/mkspecs/macx-clang/qmake.conf ../
 ../../../Qt/5.14.2/clang_64/mkspecs/features/lex.prf:
 lab8.pro:
 shaders/shaders.qrc:
+qmake_qmake_immediate.qrc:
 ../../../Qt/5.14.2/clang_64/lib/QtOpenGL.framework/Resources/QtOpenGL.prl:
 ../../../Qt/5.14.2/clang_64/lib/QtWidgets.framework/Resources/QtWidgets.prl:
 ../../../Qt/5.14.2/clang_64/lib/QtGui.framework/Resources/QtGui.prl:
@@ -742,7 +746,7 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents shaders/shaders.qrc $(DISTDIR)/
+	$(COPY_FILE) --parents shaders/shaders.qrc qmake_qmake_immediate.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents ../../../Qt/5.14.2/clang_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents src/mainwindow.h src/glwidget.h src/openglshape.h cs123_lib/resourceloader.h cs123_lib/errorchecker.h src/gl/datatype/FBO.h src/gl/datatype/VBO.h src/gl/datatype/VBOAttribMarker.h src/gl/datatype/VAO.h src/gl/datatype/IBO.h src/gl/shaders/ShaderAttribLocations.h src/gl/textures/Texture.h src/gl/textures/Texture2D.h src/gl/textures/TextureParameters.h src/gl/textures/TextureParametersBuilder.h src/gl/textures/RenderBuffer.h src/gl/textures/DepthBuffer.h src/gl/GLDebug.h cs123_lib/sphere.h src/databinding.h src/settings.h glew-1.10.0/include/GL/glew.h src/terrain.h $(DISTDIR)/
 	$(COPY_FILE) --parents src/mainwindow.cpp src/main.cpp src/glwidget.cpp src/openglshape.cpp cs123_lib/resourceloader.cpp cs123_lib/errorchecker.cpp src/gl/datatype/FBO.cpp src/gl/datatype/VBO.cpp src/gl/datatype/VBOAttribMarker.cpp src/gl/datatype/VAO.cpp src/gl/datatype/IBO.cpp src/gl/textures/Texture.cpp src/gl/textures/Texture2D.cpp src/gl/textures/TextureParameters.cpp src/gl/textures/TextureParametersBuilder.cpp src/gl/textures/RenderBuffer.cpp src/gl/textures/DepthBuffer.cpp src/gl/GLDebug.cpp src/databinding.cpp src/settings.cpp glew-1.10.0/src/glew.c src/terrain.cpp $(DISTDIR)/
@@ -773,9 +777,9 @@ check: first
 
 benchmark: first
 
-compiler_rcc_make_all: qrc_shaders.cpp
+compiler_rcc_make_all: qrc_shaders.cpp qrc_qmake_qmake_immediate.cpp
 compiler_rcc_clean:
-	-$(DEL_FILE) qrc_shaders.cpp
+	-$(DEL_FILE) qrc_shaders.cpp qrc_qmake_qmake_immediate.cpp
 qrc_shaders.cpp: shaders/shaders.qrc \
 		../../../Qt/5.14.2/clang_64/bin/rcc \
 		shaders/verticalBlur.frag \
@@ -790,6 +794,11 @@ qrc_shaders.cpp: shaders/shaders.qrc \
 		shaders/shader.vert \
 		shaders/particles_draw.frag
 	/Users/brandonqlee/Qt/5.14.2/clang_64/bin/rcc -name shaders shaders/shaders.qrc -o qrc_shaders.cpp
+
+qrc_qmake_qmake_immediate.cpp: qmake_qmake_immediate.qrc \
+		../../../Qt/5.14.2/clang_64/bin/rcc \
+		images/rocky.jpg
+	/Users/brandonqlee/Qt/5.14.2/clang_64/bin/rcc -name qmake_qmake_immediate qmake_qmake_immediate.qrc -o qrc_qmake_qmake_immediate.cpp
 
 compiler_moc_predefs_make_all: moc_predefs.h
 compiler_moc_predefs_clean:
@@ -904,6 +913,8 @@ moc_mainwindow.cpp: src/mainwindow.h \
 		src/openglshape.h \
 		src/gl/datatype/VBO.h \
 		src/gl/datatype/VBOAttribMarker.h \
+		../../../Qt/5.14.2/clang_64/lib/QtGui.framework/Headers/QImage \
+		../../../Qt/5.14.2/clang_64/lib/QtGui.framework/Headers/qimage.h \
 		moc_predefs.h \
 		../../../Qt/5.14.2/clang_64/bin/moc
 	/Users/brandonqlee/Qt/5.14.2/clang_64/bin/moc $(DEFINES) --include /Users/brandonqlee/course/cs1230/CS123JAMB/moc_predefs.h -I/Users/brandonqlee/Qt/5.14.2/clang_64/mkspecs/macx-clang -I/Users/brandonqlee/course/cs1230/CS123JAMB -I/Users/brandonqlee/course/cs1230/CS123JAMB/src -I/Users/brandonqlee/course/cs1230/CS123JAMB/cs123_lib -I/Users/brandonqlee/course/cs1230/CS123JAMB/glm -I/Users/brandonqlee/course/cs1230/CS123JAMB/glew-1.10.0/include -I/Users/brandonqlee/Qt/5.14.2/clang_64/lib/QtOpenGL.framework/Headers -I/Users/brandonqlee/Qt/5.14.2/clang_64/lib/QtWidgets.framework/Headers -I/Users/brandonqlee/Qt/5.14.2/clang_64/lib/QtGui.framework/Headers -I/Users/brandonqlee/Qt/5.14.2/clang_64/lib/QtCore.framework/Headers -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.0/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/brandonqlee/Qt/5.14.2/clang_64/lib src/mainwindow.h -o moc_mainwindow.cpp
@@ -1007,6 +1018,8 @@ moc_glwidget.cpp: src/glwidget.h \
 		src/openglshape.h \
 		src/gl/datatype/VBO.h \
 		src/gl/datatype/VBOAttribMarker.h \
+		../../../Qt/5.14.2/clang_64/lib/QtGui.framework/Headers/QImage \
+		../../../Qt/5.14.2/clang_64/lib/QtGui.framework/Headers/qimage.h \
 		moc_predefs.h \
 		../../../Qt/5.14.2/clang_64/bin/moc
 	/Users/brandonqlee/Qt/5.14.2/clang_64/bin/moc $(DEFINES) --include /Users/brandonqlee/course/cs1230/CS123JAMB/moc_predefs.h -I/Users/brandonqlee/Qt/5.14.2/clang_64/mkspecs/macx-clang -I/Users/brandonqlee/course/cs1230/CS123JAMB -I/Users/brandonqlee/course/cs1230/CS123JAMB/src -I/Users/brandonqlee/course/cs1230/CS123JAMB/cs123_lib -I/Users/brandonqlee/course/cs1230/CS123JAMB/glm -I/Users/brandonqlee/course/cs1230/CS123JAMB/glew-1.10.0/include -I/Users/brandonqlee/Qt/5.14.2/clang_64/lib/QtOpenGL.framework/Headers -I/Users/brandonqlee/Qt/5.14.2/clang_64/lib/QtWidgets.framework/Headers -I/Users/brandonqlee/Qt/5.14.2/clang_64/lib/QtGui.framework/Headers -I/Users/brandonqlee/Qt/5.14.2/clang_64/lib/QtCore.framework/Headers -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.0/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/brandonqlee/Qt/5.14.2/clang_64/lib src/glwidget.h -o moc_glwidget.cpp
@@ -1163,6 +1176,8 @@ mainwindow.o: src/mainwindow.cpp src/mainwindow.h \
 		src/openglshape.h \
 		src/gl/datatype/VBO.h \
 		src/gl/datatype/VBOAttribMarker.h \
+		../../../Qt/5.14.2/clang_64/lib/QtGui.framework/Headers/QImage \
+		../../../Qt/5.14.2/clang_64/lib/QtGui.framework/Headers/qimage.h \
 		ui_mainwindow.h \
 		../../../Qt/5.14.2/clang_64/lib/QtCore.framework/Headers/QSettings \
 		../../../Qt/5.14.2/clang_64/lib/QtCore.framework/Headers/qsettings.h \
@@ -1297,7 +1312,9 @@ main.o: src/main.cpp ../../../Qt/5.14.2/clang_64/lib/QtWidgets.framework/Headers
 		src/terrain.h \
 		src/openglshape.h \
 		src/gl/datatype/VBO.h \
-		src/gl/datatype/VBOAttribMarker.h
+		src/gl/datatype/VBOAttribMarker.h \
+		../../../Qt/5.14.2/clang_64/lib/QtGui.framework/Headers/QImage \
+		../../../Qt/5.14.2/clang_64/lib/QtGui.framework/Headers/qimage.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o src/main.cpp
 
 glwidget.o: src/glwidget.cpp src/glwidget.h \
@@ -1399,6 +1416,8 @@ glwidget.o: src/glwidget.cpp src/glwidget.h \
 		src/openglshape.h \
 		src/gl/datatype/VBO.h \
 		src/gl/datatype/VBOAttribMarker.h \
+		../../../Qt/5.14.2/clang_64/lib/QtGui.framework/Headers/QImage \
+		../../../Qt/5.14.2/clang_64/lib/QtGui.framework/Headers/qimage.h \
 		cs123_lib/resourceloader.h \
 		cs123_lib/errorchecker.h \
 		../../../Qt/5.14.2/clang_64/lib/QtGui.framework/Headers/QMouseEvent \
@@ -1625,11 +1644,16 @@ terrain.o: src/terrain.cpp src/terrain.h \
 		glew-1.10.0/include/GL/glew.h \
 		src/gl/datatype/VBO.h \
 		src/gl/datatype/VBOAttribMarker.h \
+		../../../Qt/5.14.2/clang_64/lib/QtGui.framework/Headers/QImage \
+		../../../Qt/5.14.2/clang_64/lib/QtGui.framework/Headers/qimage.h \
 		src/gl/shaders/ShaderAttribLocations.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o terrain.o src/terrain.cpp
 
 qrc_shaders.o: qrc_shaders.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_shaders.o qrc_shaders.cpp
+
+qrc_qmake_qmake_immediate.o: qrc_qmake_qmake_immediate.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_qmake_qmake_immediate.o qrc_qmake_qmake_immediate.cpp
 
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp
