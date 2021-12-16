@@ -160,32 +160,28 @@ bool Terrain::isFilledIn() {
 std::vector<glm::vec3> Terrain::init() {
     // Initializes a grid of vertices using triangle strips.
     int numVertices = (m_numRows - 1) * (2 * m_numCols + 2);
-    std::vector<glm::vec3> data(3 * numVertices);
+//    std::vector<glm::vec3> data(3 * numVertices);
+
+    std::vector<glm::vec3> data(2 * numVertices);
     int index = 0;
     for (int row = 0; row < m_numRows - 1; row++) {
         for (int col = m_numCols - 1; col >= 0; col--) {
             data[index++] = getPosition(row, col);
             data[index++] = getNormal  (row, col);
-            data[index++] = getTextureUV(row, col);
+//            data[index++] = getTextureUV(row, col);
             data[index++] = getPosition(row + 1, col);
             data[index++] = getNormal  (row + 1, col);
-            data[index++] = getTextureUV(row + 1, col);
+//            data[index++] = getTextureUV(row + 1, col);
         }
         data[index++] = getPosition(row + 1, 0);
         data[index++] = getNormal  (row + 1, 0);
-        data[index++] = getTextureUV(row + 1, 0);
+//        data[index++] = getTextureUV(row + 1, 0);
         data[index++] = getPosition(row + 1, m_numCols - 1);
         data[index++] = getNormal  (row + 1, m_numCols - 1);
-        data[index++] = getTextureUV(row + 1, m_numCols - 1);
+//        data[index++] = getTextureUV(row + 1, m_numCols - 1);
     }
 
-    //    for (int row = m_numRows / 2 - 5; row < m_numRows / 2 + 5; row++) {
-    //        for (int col = m_numCols / 2 - 5; col < m_numCols / 2 + 5; col++) {
-    //            data[index++] =
-    //        }
-    //    }
-
-    addTexture();
+//    addTexture();
 
     return data;
 }
@@ -196,29 +192,29 @@ std::vector<glm::vec3> Terrain::init() {
  */
 void Terrain::draw()
 {
-    bindTextures();
+//    bindTextures();
     openGLShape->draw();
 }
 
 void Terrain::addTexture() {
-    glGenTextures(1, &m_rock_textureID);
-    glBindTexture(GL_TEXTURE_2D, m_rock_textureID);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);// repeats and mirrors the tiled texture
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_rock_image.width(), m_rock_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_rock_image.bits());
-    glGenerateMipmap(GL_TEXTURE_2D);
+//    glGenTextures(1, &m_rock_textureID);
+//    glBindTexture(GL_TEXTURE_2D, m_rock_textureID);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);// repeats and mirrors the tiled texture
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_rock_image.width(), m_rock_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_rock_image.bits());
+//    glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 void Terrain::bindTextures() {
-    glActiveTexture(GL_TEXTURE0 + 0); // Texture unit 0
-    glBindTexture(GL_TEXTURE_2D, m_rock_textureID);
+//    glActiveTexture(GL_TEXTURE0 + 0); // Texture unit 0
+//    glBindTexture(GL_TEXTURE_2D, m_rock_textureID);
 }
 
 glm::vec3 Terrain::getTextureUV(float row, float col) {
-    int numTextureTiles = 9;
-    float u = numTextureTiles * (static_cast<float>(col) / m_numCols);
-    float v = numTextureTiles * (static_cast<float>(row) / m_numRows);
-    return glm::vec3(u, v, 0);
+//    int numTextureTiles = 9;
+//    float u = numTextureTiles * (static_cast<float>(col) / m_numCols);
+//    float v = numTextureTiles * (static_cast<float>(row) / m_numRows);
+//    return glm::vec3(u, v, 0);
 }

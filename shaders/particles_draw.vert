@@ -89,7 +89,7 @@ void main() {
     // TODO [Task 18] sample pos and vel textures
 
     // Calculate diameter based on age and lifetime
-    float diameter = 0.02;
+    float diameter = 0.2;
     diameter *= min(min(1.0, velAge.w / (0.1 * posTime.w)),
                     min(1.0, abs(posTime.w - velAge.w) / (0.1 * posTime.w)));
 
@@ -100,7 +100,7 @@ void main() {
     vec4 triPos = diameter * TRI_VERTS[triID];
 
     // anchor point in clip space
-    vec4 anchorPoint = vec4(posTime.xyz, 1.0);
+    vec4 anchorPoint = vec4(posTime.xyz + vec3(0.0, 1.0, 0.0), 1.0);
 
     // Center the particle around anchorPoint
     //    gl_Position = anchorPoint + triPos - diameter * vec4(0.5, 0.5, 0.0, 0.0);
@@ -110,7 +110,7 @@ void main() {
 //    vec3 cameraRightWorldspace(view[0][0], view[1][0], view[2][0]);
 //    vec3 cameraUpWorldspace(view[0][1], view[1][1], view[2][1]);
 
-//    gl_Position = projection * view * model * (anchorPoint + triPos - diameter * vec4(0.5, 0.5, 0.0, 0.0));
+//    gl_Position = projection * view * model * (anchorPoint + triPos - diameter * vec4(0.5, 0.5, 0.0, 1.0));
 //    gl_Position = gl_Position + cameraRightWorldspace * triPos.x * diameter + cameraUpWorldspace * triPos.y * diameter;
 //    gl_Position = projection * gl_Position;
 
@@ -129,6 +129,6 @@ void main() {
     modelView[2][1] = 0.0;
     modelView[2][2] = 1.0;
 
-    gl_Position = projection * modelView * (anchorPoint + triPos - diameter * vec4(0.5, 0.5, 0.0, 0.0));
+    gl_Position = projection * modelView * (anchorPoint + triPos - diameter * vec4(0.5, 0.5, 0.0, 1.0));
 }
 
