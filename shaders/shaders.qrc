@@ -11,5 +11,6 @@
         <file>particles_update.frag</file>
         <file>shader.frag</file>
         <file>shader.vert</file>
+        <file>lavashader.frag</file>
     </qresource>
 </RCC>

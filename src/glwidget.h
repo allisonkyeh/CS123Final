@@ -61,7 +61,8 @@ private:
     GLuint m_verticalBlurProgram;
     GLuint m_particleUpdateProgram;
     GLuint m_particleDrawProgram;
-
+    GLuint m_lavaProgram;
+    std::unique_ptr<OpenGLShape> m_lava;
     std::unique_ptr<OpenGLShape> m_quad;
     std::unique_ptr<OpenGLShape> m_sphere;
 

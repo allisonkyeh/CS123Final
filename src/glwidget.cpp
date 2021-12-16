@@ -20,6 +20,7 @@ GLWidget::GLWidget(QGLFormat format, QWidget *parent)
     : QGLWidget(format, parent),
       m_width(width()), m_height(height()),
       m_phongProgram(0), m_textureProgram(0), m_horizontalBlurProgram(0), m_verticalBlurProgram(0),
+      m_lavaProgram(0), m_lava(nullptr),
       m_quad(nullptr), m_sphere(nullptr),
       m_blurFBO1(nullptr), m_blurFBO2(nullptr),
       m_particlesFBO1(nullptr), m_particlesFBO2(nullptr),
@@ -60,9 +61,8 @@ void GLWidget::initializeGL() {
     m_particleDrawProgram = ResourceLoader::createShaderProgram(
                 ":/shaders/particles_draw.vert", ":/shaders/particles_draw.frag");
 
-    // TERRAIN
+    /****** TERRAIN *******/
     m_program = ResourceLoader::createShaderProgram(":/shaders/shader.vert", ":/shaders/shader.frag");
-    // ENDDD
 
     // Initialize sphere OpenGLShape.
     std::vector<GLfloat> sphereData = SPHERE_VERTEX_POSITIONS;
@@ -72,43 +72,62 @@ void GLWidget::initializeGL() {
     m_sphere->setAttribute(ShaderAttrib::NORMAL, 3, 0, VBOAttribMarker::DATA_TYPE::FLOAT, false);
     m_sphere->buildVAO();
 
-    // TODO: [Task 6] Fill in the positions and UV coordinates to draw a fullscreen quad
-    // We've already set the vertex attributes for you, so be sure to follow those specifications
-    // (triangle strip, 4 vertices, position followed by UVs)
     std::vector<GLfloat> quadData = {
         -1, 1, 0,
-        0, 1,
-        -1, -1, 0,
-        0,0,
-        1, 1, 0,
-        1, 1,
-        1, -1, 0,
-        1,0
+         0, 1,
+        -1,-1, 0,
+         0, 0,
+         1, 1, 0,
+         1, 1,
+         1,-1, 0,
+         1, 0
     };
     m_quad = std::make_unique<OpenGLShape>();
     m_quad->setVertexData(&quadData[0], quadData.size(), VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP, 4);
     m_quad->setAttribute(ShaderAttrib::POSITION, 3, 0, VBOAttribMarker::DATA_TYPE::FLOAT, false);
     m_quad->setAttribute(ShaderAttrib::TEXCOORD0, 2, 3*sizeof(GLfloat), VBOAttribMarker::DATA_TYPE::FLOAT, false);
     m_quad->buildVAO();
+    /****** TERRAIN END *******/
 
-    // We will use this VAO to draw our particles' triangles.
-    // It doesn't need any data associated with it, so we don't have to make a full VAO instance
+    /****** LAVA SEA *******/
+    m_lavaProgram = ResourceLoader::createShaderProgram(":/shaders/shader.vert", ":/shaders/lavashader.frag");
+    std::vector<GLfloat> squareData = {-1.f, -1.f, 0.f,
+                                       -1.f, +1.f, 0.f,
+                                       +1.f, -1.f, 0.f,
+                                       +1.f, +1.f, 0.f};
+    m_lava = std::make_unique<OpenGLShape>();
+    m_lava->setVertexData(&squareData[0], squareData.size(), VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP, 4);
+    m_lava->setAttribute(ShaderAttrib::POSITION, 3, 0, VBOAttribMarker::DATA_TYPE::FLOAT, false);
+    m_lava->buildVAO();
+
+    std::vector<GLfloat> lavaData;
+    lavaData = {-1, -1, 0,
+                 0,  0,
+                +1, -1, 0,
+                 1,  0,
+                -1, +1, 0,
+                 0,  1,
+                +1, +1, 0,
+                 1,  1    };
+    m_quad = std::make_unique<OpenGLShape>();
+    m_quad->setVertexData(&lavaData[0], lavaData.size(), VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP, 4);
+    m_quad->setAttribute(ShaderAttrib::POSITION, 3, 0, VBOAttribMarker::DATA_TYPE::FLOAT, false);
+    m_quad->setAttribute(ShaderAttrib::TEXCOORD0, 2, 3*sizeof(GLfloat), VBOAttribMarker::DATA_TYPE::FLOAT, false);
+    m_quad->buildVAO();
+    /****** LAVA SEA END *******/
+
+    // VAO to draw our particles' triangles
     glGenVertexArrays(1, &m_particlesVAO);
-    // TODO [Task 13] Create m_particlesFBO1 and 2 with std::make_shared
 
-    //    FBO(int numberOfColorAttachments, DEPTH_STENCIL_ATTACHMENT attachmentType, int m_width, int m_height,
-    //        TextureParameters::WRAP_METHOD wrapMethod = TextureParameters::WRAP_METHOD::REPEAT,
-    //        TextureParameters::FILTER_METHOD filterMethod = TextureParameters::FILTER_METHOD::LINEAR,
-    //        GLenum type = GL_UNSIGNED_BYTE);
     m_particlesFBO1 = std::make_shared<FBO>(2, FBO::DEPTH_STENCIL_ATTACHMENT::NONE, m_numParticles, 1, TextureParameters::WRAP_METHOD::CLAMP_TO_EDGE, TextureParameters::FILTER_METHOD::NEAREST, GL_FLOAT);
     m_particlesFBO2 = std::make_shared<FBO>(2, FBO::DEPTH_STENCIL_ATTACHMENT::NONE, m_numParticles, 1, TextureParameters::WRAP_METHOD::CLAMP_TO_EDGE, TextureParameters::FILTER_METHOD::NEAREST, GL_FLOAT);
 
-    // Print the max FBO dimension.
+    // Print the max FBO dimension
     GLint maxRenderBufferSize;
     glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE_EXT, &maxRenderBufferSize);
     std::cout << "Max FBO size: " << maxRenderBufferSize << std::endl;
 
-    /*********** TERRAIN ***********/
+    /******* TERRAIN ********/
     ResourceLoader::initializeGlew();
     resizeGL(width(), height());
 
@@ -130,8 +149,7 @@ void GLWidget::initializeGL() {
     m_terrain.openGLShape->buildVAO();
 
     rebuildMatrices();
-
-    /*********** ENDDDD ***********/
+    /******** TERRAIN END *******/
     //    initializeOpenGLFunctions();
 
     mProgram.addShaderFromSourceCode(
@@ -236,28 +254,46 @@ void GLWidget::paintGL() {
         break;
     }
 
-    /*********** TERRAIN ***********/
+    /******* TERRAIN *******/
     //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Bind shader program.
+    // Bind shader program
     glUseProgram(m_program);
 
-    // Set uniforms.
+    // Set uniforms
     glUniformMatrix4fv(glGetUniformLocation(m_program, "model"), 1, GL_FALSE, glm::value_ptr(m_model));
     glUniformMatrix4fv(glGetUniformLocation(m_program, "view"), 1, GL_FALSE, glm::value_ptr(m_view));
     glUniformMatrix4fv(glGetUniformLocation(m_program, "projection"), 1, GL_FALSE, glm::value_ptr(m_projection));
 
     glUniform1i(glGetUniformLocation(m_program, "rock_tex"), 0);
 
-    // Draw terrain.
+    // Draw terrain
     m_terrain.draw();
-
-    // Unbind shader program.
+    // Unbind shader program
     glUseProgram(0);
-    /*********** ENDDDD ***********/
+    /****** TERRAIN END *******/
 
-
-
+    /****** LAVA SEA *******/
+    // Bind lava shader program
+    glUseProgram(m_lavaProgram);
+    // Set uniforms
+    glUniformMatrix4fv(glGetUniformLocation(m_lavaProgram, "model"), 1, GL_FALSE, glm::value_ptr(m_model));
+    glUniformMatrix4fv(glGetUniformLocation(m_lavaProgram, "view"), 1, GL_FALSE, glm::value_ptr(m_view));
+    glUniformMatrix4fv(glGetUniformLocation(m_lavaProgram, "projection"), 1, GL_FALSE, glm::value_ptr(m_projection));
+    // Set color
+    glUniform3f(glGetUniformLocation(m_lavaProgram, "color"), 2.5f, 0.8f, 0);
+    // Move lava down
+    glm::mat4 transMat  = glm::translate(glm::vec3(0, -0.4, 0));
+    int modelUniLoc     = glGetUniformLocation(m_lavaProgram, "model");
+    glUniformMatrix4fv(modelUniLoc, 1, GL_FALSE, glm::value_ptr(transMat));
+    // Scale to be bigger and rotate
+    glm::mat4 scaleMat  = glm::scale(glm::vec3(5.f));
+    glm::mat4 rotMat    = glm::rotate((float) M_PI_2, glm::vec3(1.f, 0, 0));
+    glUniformMatrix4fv(modelUniLoc, 1, GL_FALSE, glm::value_ptr(rotMat * scaleMat + transMat));
+    m_lava->draw();
+    // Unbind shader program
+    glUseProgram(0);
+    /****** LAVA SEA END *******/
 }
 
 void GLWidget::drawBlur() {
@@ -269,20 +305,15 @@ void GLWidget::drawBlur() {
 
     glUseProgram(m_phongProgram);
 
-    GLint viewLoc = glGetUniformLocation(m_phongProgram, "view");
+    GLint viewLoc   = glGetUniformLocation(m_phongProgram, "view");
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(m_view));
     GLint projecLoc = glGetUniformLocation(m_phongProgram, "projection");
     glUniformMatrix4fv(projecLoc, 1, GL_FALSE, glm::value_ptr(m_projection));
-    GLint modelLoc = glGetUniformLocation(m_phongProgram, "model");
+    GLint modelLoc  = glGetUniformLocation(m_phongProgram, "model");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(glm::translate(glm::vec3(0, 1.2, 0))));
     glViewport(0, 0, m_width, m_height);
 
     m_sphere->draw();
-    //       [Task 1.5] Call glViewport so that the viewport is the right size
-    //       [Task 5b] Bind m_blurFBO1
-    //       [Task 8] Bind m_blurFBO1's color texture
-    //       [Task 7] Unbind m_blurFBO1 and render a full screen quad
-    //       [Task 11] Bind m_blurFBO2
 
     m_blurFBO1->getColorAttachment(0).bind();
     m_blurFBO1->unbind();
@@ -303,7 +334,6 @@ void GLWidget::drawBlur() {
     glViewport(0, 0, m_width, m_height);
 
     m_quad->draw();
-
 }
 
 void GLWidget::drawParticles() {
@@ -311,7 +341,7 @@ void GLWidget::drawParticles() {
     auto nextFBO = m_evenPass ? m_particlesFBO2 : m_particlesFBO1;
     float firstPass = m_firstPass ? 1.0f : 0.0f;
 
-    // TODO [Task 14] Move the particles from prevFBO to nextFBO while updating them
+    // Move the particles from prevFBO to nextFBO while updating them
     nextFBO->bind();
     glUseProgram(m_particleUpdateProgram);
 
@@ -326,7 +356,7 @@ void GLWidget::drawParticles() {
     glUniform1i(numParticlesLoc, m_numParticles);
 
 
-    // two textures sent as ints
+    // Two textures sent as ints
     GLint prevPosLoc = glGetUniformLocation(m_particleUpdateProgram, "prevPos");
     glUniform1i(prevPosLoc, 0);
     GLint prevVelLoc = glGetUniformLocation(m_particleUpdateProgram, "prevVel");
@@ -334,7 +364,7 @@ void GLWidget::drawParticles() {
 
     m_quad->draw();
 
-    // TODO [Task 17] Draw the particles from nextFBO
+    // Draw the particles from nextFBO
     nextFBO->unbind();
 
     glClear(GL_COLOR_BUFFER_BIT);
@@ -347,7 +377,6 @@ void GLWidget::drawParticles() {
     nextFBO->getColorAttachment(0).bind();
     glActiveTexture(GL_TEXTURE1);
     nextFBO->getColorAttachment(1).bind();
-
 
     GLint modelLoc = glGetUniformLocation(m_particleDrawProgram, "model");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &m_model[0][0]);
@@ -366,7 +395,7 @@ void GLWidget::drawParticles() {
     // draw triangles
     glBindVertexArray(m_particlesVAO);
     glDrawArrays(GL_TRIANGLES, 0, 3 * m_numParticles);  // m_particlesVAO for second argument??
-    glBindVertexArray(0);   // Unbind the VAO?
+    glBindVertexArray(0);                               // Unbind the VAO?
 
     glActiveTexture(GL_TEXTURE0);
 
@@ -385,10 +414,9 @@ void GLWidget::resizeGL(int w, int h) {
     m_blurFBO2 = std::make_unique<FBO>(1, FBO::DEPTH_STENCIL_ATTACHMENT::NONE, w, h, TextureParameters::WRAP_METHOD::CLAMP_TO_EDGE);
     //       [Task 12] Pass in TextureParameters::WRAP_METHOD::CLAMP_TO_EDGE as the last parameter
 
-    //terrain
+    /****** TERRAIN ******/
     glViewport(0, 0, w, h);
 
-    //end
     rebuildMatrices();
 }
 
