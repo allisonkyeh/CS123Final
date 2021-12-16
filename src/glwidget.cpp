@@ -28,7 +28,7 @@ GLWidget::GLWidget(QGLFormat format, QWidget *parent)
       // particles
       //      m_angleX(-0.5f), m_angleY(0.5f), m_zoom(4.f)
       // end
-      m_angleX(0), m_angleY(0.5f), m_zoom(10.f),
+      m_angleX(0), m_angleY(0.15f), m_zoom(9.f),
       mTexture(QOpenGLTexture::TargetCubeMap),
       mVertexBuf(QOpenGLBuffer::VertexBuffer),
       mSpeed(0.0f)
@@ -45,7 +45,7 @@ void GLWidget::initializeGL() {
     glEnable(GL_DEPTH_TEST);
 
     // Set the color to set the screen when the color buffer is cleared.
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.5f, 0.8f, 0.9f, 0.0f);
 
     // Create shader programs.
     m_phongProgram = ResourceLoader::createShaderProgram(
@@ -74,13 +74,13 @@ void GLWidget::initializeGL() {
 
     std::vector<GLfloat> quadData = {
         -1, 1, 0,
-         0, 1,
+        0, 1,
         -1,-1, 0,
-         0, 0,
-         1, 1, 0,
-         1, 1,
-         1,-1, 0,
-         1, 0
+        0, 0,
+        1, 1, 0,
+        1, 1,
+        1,-1, 0,
+        1, 0
     };
     m_quad = std::make_unique<OpenGLShape>();
     m_quad->setVertexData(&quadData[0], quadData.size(), VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP, 4);
@@ -102,13 +102,13 @@ void GLWidget::initializeGL() {
 
     std::vector<GLfloat> lavaData;
     lavaData = {-1, -1, 0,
-                 0,  0,
+                0,  0,
                 +1, -1, 0,
-                 1,  0,
+                1,  0,
                 -1, +1, 0,
-                 0,  1,
+                0,  1,
                 +1, +1, 0,
-                 1,  1    };
+                1,  1    };
     m_quad = std::make_unique<OpenGLShape>();
     m_quad->setVertexData(&lavaData[0], lavaData.size(), VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP, 4);
     m_quad->setAttribute(ShaderAttrib::POSITION, 3, 0, VBOAttribMarker::DATA_TYPE::FLOAT, false);
@@ -135,7 +135,7 @@ void GLWidget::initializeGL() {
     glEnable(GL_CULL_FACE);
 
     // Set the color to set the screen when the color buffer is cleared.
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    //    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     m_program = ResourceLoader::createShaderProgram(":/shaders/shader.vert", ":/shaders/shader.frag");
 
@@ -250,7 +250,7 @@ void GLWidget::paintGL() {
         break;
     case MODE_PARTICLES:
         drawParticles();
-        //        update();
+        update();
         break;
     }
 
@@ -283,12 +283,12 @@ void GLWidget::paintGL() {
     // Set color
     glUniform3f(glGetUniformLocation(m_lavaProgram, "color"), 2.5f, 0.8f, 0);
     // Move lava down
-    glm::mat4 transMat  = glm::translate(glm::vec3(0, -0.4, 0));
+    glm::mat4 transMat  = glm::translate(glm::vec3(0, -0.5, 0));
     int modelUniLoc     = glGetUniformLocation(m_lavaProgram, "model");
     glUniformMatrix4fv(modelUniLoc, 1, GL_FALSE, glm::value_ptr(transMat));
     // Scale to be bigger and rotate
-    glm::mat4 scaleMat  = glm::scale(glm::vec3(5.f));
-    glm::mat4 rotMat    = glm::rotate((float) M_PI_2, glm::vec3(1.f, 0, 0));
+    glm::mat4 scaleMat  = glm::scale(glm::vec3(10.f));
+    glm::mat4 rotMat    = glm::rotate((float) M_PI_2, glm::vec3(1.0, 0, 0));
     glUniformMatrix4fv(modelUniLoc, 1, GL_FALSE, glm::value_ptr(rotMat * scaleMat + transMat));
     m_lava->draw();
     // Unbind shader program
@@ -437,7 +437,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event) {
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event) {
     m_angleX += 3 * (event->x() - m_prevMousePos.x()) / (float) width();
-    m_angleY += 3 * (event->y() - m_prevMousePos.y()) / (float) height();
+    //    m_angleY += 3 * (event->y() - m_prevMousePos.y()) / (float) height();
     m_prevMousePos = event->pos();
     rebuildMatrices();
 }
@@ -460,46 +460,46 @@ void GLWidget::rebuildMatrices() {
 
 void GLWidget::loadImages()
 {
-    const QImage posx = QImage(":/images/posx.jpg").convertToFormat(QImage::Format_RGBA8888);
-    const QImage negx = QImage(":/images/negx.jpg").convertToFormat(QImage::Format_RGBA8888);
+    //    const QImage posx = QImage(":/images/posx.jpg").convertToFormat(QImage::Format_RGBA8888);
+    //    const QImage negx = QImage(":/images/negx.jpg").convertToFormat(QImage::Format_RGBA8888);
 
-    const QImage posy = QImage(":/images/posy.jpg").convertToFormat(QImage::Format_RGBA8888);
-    const QImage negy = QImage(":/images/negy.jpg").convertToFormat(QImage::Format_RGBA8888);
+    //    const QImage posy = QImage(":/images/posy.jpg").convertToFormat(QImage::Format_RGBA8888);
+    //    const QImage negy = QImage(":/images/negy.jpg").convertToFormat(QImage::Format_RGBA8888);
 
-    const QImage posz = QImage(":/images/posz.jpg").convertToFormat(QImage::Format_RGBA8888);
-    const QImage negz = QImage(":/images/negz.jpg").convertToFormat(QImage::Format_RGBA8888);
+    //    const QImage posz = QImage(":/images/posz.jpg").convertToFormat(QImage::Format_RGBA8888);
+    //    const QImage negz = QImage(":/images/negz.jpg").convertToFormat(QImage::Format_RGBA8888);
 
-    mTexture.create();
-    mTexture.setSize(posx.width(), posx.height(), posx.depth());
-    mTexture.setFormat(QOpenGLTexture::RGBA8_UNorm);
-    mTexture.allocateStorage();
+    //    mTexture.create();
+    //    mTexture.setSize(posx.width(), posx.height(), posx.depth());
+    //    mTexture.setFormat(QOpenGLTexture::RGBA8_UNorm);
+    //    mTexture.allocateStorage();
 
-    mTexture.setData(0, 0, QOpenGLTexture::CubeMapPositiveX,
-                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                     posx.constBits(), Q_NULLPTR);
+    //    mTexture.setData(0, 0, QOpenGLTexture::CubeMapPositiveX,
+    //                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+    //                     posx.constBits(), Q_NULLPTR);
 
-    mTexture.setData(0, 0, QOpenGLTexture::CubeMapPositiveY,
-                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                     posy.constBits(), Q_NULLPTR);
+    //    mTexture.setData(0, 0, QOpenGLTexture::CubeMapPositiveY,
+    //                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+    //                     posy.constBits(), Q_NULLPTR);
 
-    mTexture.setData(0, 0, QOpenGLTexture::CubeMapPositiveZ,
-                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                     posz.constBits(), Q_NULLPTR);
+    //    mTexture.setData(0, 0, QOpenGLTexture::CubeMapPositiveZ,
+    //                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+    //                     posz.constBits(), Q_NULLPTR);
 
-    mTexture.setData(0, 0, QOpenGLTexture::CubeMapNegativeX,
-                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                     negx.constBits(), Q_NULLPTR);
+    //    mTexture.setData(0, 0, QOpenGLTexture::CubeMapNegativeX,
+    //                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+    //                     negx.constBits(), Q_NULLPTR);
 
-    mTexture.setData(0, 0, QOpenGLTexture::CubeMapNegativeY,
-                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                     negy.constBits(), Q_NULLPTR);
+    //    mTexture.setData(0, 0, QOpenGLTexture::CubeMapNegativeY,
+    //                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+    //                     negy.constBits(), Q_NULLPTR);
 
-    mTexture.setData(0, 0, QOpenGLTexture::CubeMapNegativeZ,
-                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                     negz.constBits(), Q_NULLPTR);
+    //    mTexture.setData(0, 0, QOpenGLTexture::CubeMapNegativeZ,
+    //                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+    //                     negz.constBits(), Q_NULLPTR);
 
-    mTexture.setWrapMode(QOpenGLTexture::ClampToEdge);
-    mTexture.setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    mTexture.setMagnificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    //    mTexture.setWrapMode(QOpenGLTexture::ClampToEdge);
+    //    mTexture.setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    //    mTexture.setMagnificationFilter(QOpenGLTexture::LinearMipMapLinear);
 }
 
