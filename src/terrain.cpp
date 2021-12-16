@@ -25,9 +25,9 @@ float Terrain::randValue(int row, int col)
 
     float r = float(row)-10.0;
     float c = float(col)-10.0;
-    return (r*r+c*c+15)/(r*r+c*c+3)+val*0.25-1; // hyperbola
+    return (r*r+c*c+25)/(r*r+c*c+5)+val*0.3-1.8; // hyperbola
 
-//    return -sqrt(0.07*(r*r+c*c))+val*0.15;
+    // return -sqrt(0.05*(r*r+c*c))+val*0.15+1.8f;
 
     return val;
 }

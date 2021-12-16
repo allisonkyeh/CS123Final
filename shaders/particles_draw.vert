@@ -15,7 +15,6 @@ out vec3 color;
 const int NUM_VERTICES_PER_PARTICLE = 3;
 const vec4 TRI_VERTS[NUM_VERTICES_PER_PARTICLE] = vec4[NUM_VERTICES_PER_PARTICLE](
         // TODO [Task 18] Calculate the triangle point offsets (see diagram in handout)
-
             vec4(0, 2, 0, 0),
             vec4(0, 0, 0, 0),
             vec4(2, 0, 0, 0)
@@ -100,21 +99,12 @@ void main() {
     vec4 triPos = diameter * TRI_VERTS[triID];
 
     // anchor point in clip space
-    vec4 anchorPoint = vec4(posTime.xyz + vec3(0.0, 1.0, 0.0), 1.0);
+    vec4 anchorPoint = vec4(posTime.xyz + vec3(0.0, 1.9, 0.0), 1.0);
 
     // Center the particle around anchorPoint
     //    gl_Position = anchorPoint + triPos - diameter * vec4(0.5, 0.5, 0.0, 0.0);
 
-    //////////// Billboarding attempt 1:
-
-//    vec3 cameraRightWorldspace(view[0][0], view[1][0], view[2][0]);
-//    vec3 cameraUpWorldspace(view[0][1], view[1][1], view[2][1]);
-
-//    gl_Position = projection * view * model * (anchorPoint + triPos - diameter * vec4(0.5, 0.5, 0.0, 1.0));
-//    gl_Position = gl_Position + cameraRightWorldspace * triPos.x * diameter + cameraUpWorldspace * triPos.y * diameter;
-//    gl_Position = projection * gl_Position;
-
-    //////////// Billboarding attempt 2:
+    /******* Billboarding ******/
 
     mat4 modelView = view * model;
     modelView[0][0] = 1.0;

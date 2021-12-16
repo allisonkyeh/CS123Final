@@ -41,9 +41,9 @@ MainWindow::~MainWindow()
 void MainWindow::dataBind() {
 #define BIND(b) { DataBinding *_b = (b); m_bindings.push_back(_b); assert(connect(_b, SIGNAL(dataChanged()), this, SLOT(settingsChanged()))); }
 
-    BIND(ChoiceBinding::bindRadioButtons(NUM_MODES, settings.mode,
-                                    m_ui->modeBlur,
-                                    m_ui->modeParticles));
+//    BIND(ChoiceBinding::bindRadioButtons(NUM_MODES, settings.mode,
+//                                    m_ui->modeBlur,
+//                                    m_ui->modeParticles));
 #undef BIND
 }
 

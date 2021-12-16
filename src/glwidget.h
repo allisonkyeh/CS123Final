@@ -11,9 +11,6 @@
 #include <memory>  // std::unique_ptr
 
 #include "gl/datatype/FBO.h"
-#include <QOpenGLShaderProgram>
-#include <QOpenGLTexture>
-#include <QOpenGLBuffer>
 
 // terrain
 #ifdef __APPLE__
@@ -31,8 +28,7 @@ class GLWidget : public QGLWidget {
     Q_OBJECT
 
 public:
-    GLWidget(QGLFormat format,
-             QWidget *parent = 0);
+    GLWidget(QGLFormat format, QWidget *parent = 0);
     ~GLWidget();
 
 
@@ -43,8 +39,6 @@ protected:
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
     void wheelEvent(QWheelEvent *e);
-//    void timerEvent(QTimerEvent *);
-
 private:
     void drawBlur();
     void drawParticles();
@@ -86,45 +80,6 @@ private:
     /** For mouse interaction. */
     float m_angleX, m_angleY, m_zoom;
     QPoint m_prevMousePos;
-
-    /** skybox */
-    void loadImages();
-
-    QOpenGLShaderProgram mProgram;
-    QOpenGLTexture mTexture;
-    QOpenGLBuffer mVertexBuf;
-    QBasicTimer mTimer;
-
-    struct
-    {
-        float verticalAngle;
-        float aspectRatio;
-        float nearPlane;
-        float farPlane;
-    } mPerspective;
-
-    struct
-    {
-        glm::vec3 eye;
-        glm::vec3 center;
-        glm::vec3 up;
-    } mLookAt;
-
-
-//    QVector3D mRotationAxis;
-//    QQuaternion mRotation;
-
-    glm::vec2 mMousePressPosition;
-    float mSpeed;
-
-    QString mFrontImagePath;
-    QString mBackImagePath;
-    QString mTopImagePath;
-    QString mBottomImagePath;
-    QString mLeftImagePath;
-    QString mRightImagePath;
-
-
 
 };
 
