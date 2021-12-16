@@ -65,8 +65,6 @@ private:
     std::unique_ptr<OpenGLShape> m_lava;
     std::unique_ptr<OpenGLShape> m_quad;
     std::unique_ptr<OpenGLShape> m_sphere;
-//    std::unique_ptr<OpenGLShape> m_sky;
-
 
     std::unique_ptr<FBO> m_blurFBO1;
     std::unique_ptr<FBO> m_blurFBO2;

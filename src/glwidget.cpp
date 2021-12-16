@@ -26,9 +26,9 @@ GLWidget::GLWidget(QGLFormat format, QWidget *parent)
       m_particlesFBO1(nullptr), m_particlesFBO2(nullptr),
       m_firstPass(true), m_evenPass(true), m_numParticles(5000),
       // particles
-      //            m_angleX(-0.5f), m_angleY(0.5f), m_zoom(4.f),
+      //      m_angleX(-0.5f), m_angleY(0.5f), m_zoom(4.f)
       // end
-      m_angleX(0), m_angleY(0.15f), m_zoom(9.f),
+      m_angleX(0), m_angleY(0.5f), m_zoom(10.f),
       mTexture(QOpenGLTexture::TargetCubeMap),
       mVertexBuf(QOpenGLBuffer::VertexBuffer),
       mSpeed(0.0f)
@@ -45,7 +45,7 @@ void GLWidget::initializeGL() {
     glEnable(GL_DEPTH_TEST);
 
     // Set the color to set the screen when the color buffer is cleared.
-    glClearColor(0.5f, 0.8f, 0.9f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     // Create shader programs.
     m_phongProgram = ResourceLoader::createShaderProgram(
@@ -74,13 +74,13 @@ void GLWidget::initializeGL() {
 
     std::vector<GLfloat> quadData = {
         -1, 1, 0,
-        0, 1,
+         0, 1,
         -1,-1, 0,
-        0, 0,
-        1, 1, 0,
-        1, 1,
-        1,-1, 0,
-        1, 0
+         0, 0,
+         1, 1, 0,
+         1, 1,
+         1,-1, 0,
+         1, 0
     };
     m_quad = std::make_unique<OpenGLShape>();
     m_quad->setVertexData(&quadData[0], quadData.size(), VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP, 4);
@@ -101,57 +101,20 @@ void GLWidget::initializeGL() {
     m_lava->buildVAO();
 
     std::vector<GLfloat> lavaData;
-//    lavaData = {-1, -1, 0,
-//                0,  0,
-//                +1, -1, 0,
-//                1,  0,
-//                -1, +1, 0,
-//                0,  1,
-//                +1, +1, 0,
-//                1,  1    };
-    lavaData = {-.5, .5, 0,
-                                      1, 0, 0,
-                                      -.5, -.5, 0,
-                                      0, 1, 0,
-                                      .5, .5, 0,
-                                      1,1,0,
-                                      .5, -.5, 0,
-                                      0,0,1};
+    lavaData = {-1, -1, 0,
+                 0,  0,
+                +1, -1, 0,
+                 1,  0,
+                -1, +1, 0,
+                 0,  1,
+                +1, +1, 0,
+                 1,  1    };
     m_quad = std::make_unique<OpenGLShape>();
-//    m_quad->setVertexData(&lavaData[0], lavaData.size(), VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP, 4);
-    m_quad->setVertexData(&lavaData[0], lavaData.size(), VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP, lavaData.size()/6);
-
+    m_quad->setVertexData(&lavaData[0], lavaData.size(), VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP, 4);
     m_quad->setAttribute(ShaderAttrib::POSITION, 3, 0, VBOAttribMarker::DATA_TYPE::FLOAT, false);
     m_quad->setAttribute(ShaderAttrib::TEXCOORD0, 2, 3*sizeof(GLfloat), VBOAttribMarker::DATA_TYPE::FLOAT, false);
     m_quad->buildVAO();
     /****** LAVA SEA END *******/
-
-    /*** sky color ***/
-//    m_sky = std::make_unique<OpenGLShape>();
-
-
-    // TODO: Interleave positions and colors in the array used to intialize m_square (Task 11)
-    //    m_square->setAttribute(ShaderAttrib::COLOR, 3, 12, VBOAttribMarker::DATA_TYPE::FLOAT, false);
-    // TODO: Interleave UV-coordinates along with positions and colors in your VBO (Task 15)
-    std::vector<float> coordinates = {-.5, .5, 0,
-                                      1, 0, 0,
-                                      -.5, -.5, 0,
-                                      0, 1, 0,
-                                      .5, .5, 0,
-                                      1,1,0,
-                                      .5, -.5, 0,
-                                      0,0,1};
-    // TODO: update the stride (last argument to setVertexData) when adding info to square (Task 11 & 15)aaaaa
-    m_sky->setVertexData(&coordinates[0], coordinates.size(), VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP,
-            coordinates.size() / 6);
-    m_sky->setAttribute(ShaderAttrib::POSITION, 3, 0, VBOAttribMarker::DATA_TYPE::FLOAT, false);
-    m_sky->setAttribute(ShaderAttrib::COLOR, 3, 12, VBOAttribMarker::DATA_TYPE::FLOAT, false);
-
-    // TODO: Don't forget to add the color attribute similar to how you do for the position above (Task 11)
-
-    m_sky->buildVAO();
-
-    /*** end sky *** /
 
     // VAO to draw our particles' triangles
     glGenVertexArrays(1, &m_particlesVAO);
@@ -172,7 +135,7 @@ void GLWidget::initializeGL() {
     glEnable(GL_CULL_FACE);
 
     // Set the color to set the screen when the color buffer is cleared.
-    //    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     m_program = ResourceLoader::createShaderProgram(":/shaders/shader.vert", ":/shaders/shader.frag");
 
@@ -287,7 +250,7 @@ void GLWidget::paintGL() {
         break;
     case MODE_PARTICLES:
         drawParticles();
-        update();
+        //        update();
         break;
     }
 
@@ -302,7 +265,7 @@ void GLWidget::paintGL() {
     glUniformMatrix4fv(glGetUniformLocation(m_program, "view"), 1, GL_FALSE, glm::value_ptr(m_view));
     glUniformMatrix4fv(glGetUniformLocation(m_program, "projection"), 1, GL_FALSE, glm::value_ptr(m_projection));
 
-    //    glUniform1i(glGetUniformLocation(m_program, "rock_tex"), 0);
+    glUniform1i(glGetUniformLocation(m_program, "rock_tex"), 0);
 
     // Draw terrain
     m_terrain.draw();
@@ -320,40 +283,17 @@ void GLWidget::paintGL() {
     // Set color
     glUniform3f(glGetUniformLocation(m_lavaProgram, "color"), 2.5f, 0.8f, 0);
     // Move lava down
-    glm::mat4 transMat  = glm::translate(glm::vec3(0, -0.5, 0));
+    glm::mat4 transMat  = glm::translate(glm::vec3(0, -0.4, 0));
     int modelUniLoc     = glGetUniformLocation(m_lavaProgram, "model");
     glUniformMatrix4fv(modelUniLoc, 1, GL_FALSE, glm::value_ptr(transMat));
     // Scale to be bigger and rotate
-    glm::mat4 scaleMat  = glm::scale(glm::vec3(10.f));
+    glm::mat4 scaleMat  = glm::scale(glm::vec3(5.f));
     glm::mat4 rotMat    = glm::rotate((float) M_PI_2, glm::vec3(1.f, 0, 0));
     glUniformMatrix4fv(modelUniLoc, 1, GL_FALSE, glm::value_ptr(rotMat * scaleMat + transMat));
     m_lava->draw();
-
-
     // Unbind shader program
     glUseProgram(0);
     /****** LAVA SEA END *******/
-
-    // Bind lava shader program
-    glUseProgram(m_textureProgram);
-    // Set uniforms
-    glUniformMatrix4fv(glGetUniformLocation(m_textureProgram, "model"), 1, GL_FALSE, glm::value_ptr(m_model));
-    glUniformMatrix4fv(glGetUniformLocation(m_textureProgram, "view"), 1, GL_FALSE, glm::value_ptr(m_view));
-    glUniformMatrix4fv(glGetUniformLocation(m_textureProgram, "projection"), 1, GL_FALSE, glm::value_ptr(m_projection));
-    // Set color
-    glUniform3f(glGetUniformLocation(m_textureProgram, "color"), 2.5f, 0.8f, 0);
-    // Move lava down
-    glm::mat4 transMatrix  = glm::translate(glm::vec3(0, -0.5, 0));
-    int modelUniLocation     = glGetUniformLocation(m_textureProgram, "model");
-    glUniformMatrix4fv(modelUniLocation, 1, GL_FALSE, glm::value_ptr(transMat));
-    // Scale to be bigger and rotate
-    glm::mat4 scaleMatrix  = glm::scale(glm::vec3(10.f));
-    glm::mat4 rotMatrix    = glm::rotate((float) M_PI_2, glm::vec3(1.f, 0, 0));
-    glUniformMatrix4fv(modelUniLocation, 1, GL_FALSE, glm::value_ptr(rotMatrix * scaleMatrix + transMatrix));
-
-//    m_sky->draw();
-    // Unbind shader program
-    glUseProgram(0);
 }
 
 void GLWidget::drawBlur() {
@@ -497,7 +437,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event) {
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event) {
     m_angleX += 3 * (event->x() - m_prevMousePos.x()) / (float) width();
-    //    m_angleY += 3 * (event->y() - m_prevMousePos.y()) / (float) height();
+    m_angleY += 3 * (event->y() - m_prevMousePos.y()) / (float) height();
     m_prevMousePos = event->pos();
     rebuildMatrices();
 }
