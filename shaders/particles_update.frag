@@ -62,7 +62,7 @@ vec4 updatePosition(int index) {
 }
 
 vec4 updateVelocity(int index) {
-    const float G = -0.1;
+    const float G = -0.5;
     // TODO [Task 16]
     // - sample prevVel at uv
     // - only force is gravity in y direction.  Add G * dt.

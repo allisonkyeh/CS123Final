@@ -17,7 +17,7 @@ const vec4 TRI_VERTS[NUM_VERTICES_PER_PARTICLE] = vec4[NUM_VERTICES_PER_PARTICLE
         // TODO [Task 18] Calculate the triangle point offsets (see diagram in handout)
 
             vec4(0, 2, 0, 0),
-            vec4(0, 0, 2, 0),
+            vec4(0, 0, 0, 0),
             vec4(2, 0, 0, 0)
             );
 
@@ -73,7 +73,7 @@ vec3 HSLtoRGB(float h, float s, float l) {
 }
 
 vec3 pickRainbowColor(float x) {
-    return HSLtoRGB(x, 0.5, 0.5);
+    return HSLtoRGB(x, 0.8, 0.5);
 }
 
 void main() {

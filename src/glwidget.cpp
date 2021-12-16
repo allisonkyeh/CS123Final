@@ -28,7 +28,7 @@ GLWidget::GLWidget(QGLFormat format, QWidget *parent)
       // particles
       //      m_angleX(-0.5f), m_angleY(0.5f), m_zoom(4.f)
       // end
-      m_angleX(0), m_angleY(0.15f), m_zoom(9.f),
+      m_angleX(0), m_angleY(0.15f), m_zoom(10.f),
       mTexture(QOpenGLTexture::TargetCubeMap),
       mVertexBuf(QOpenGLBuffer::VertexBuffer),
       mSpeed(0.0f)
@@ -45,7 +45,7 @@ void GLWidget::initializeGL() {
     glEnable(GL_DEPTH_TEST);
 
     // Set the color to set the screen when the color buffer is cleared.
-    glClearColor(0.5f, 0.8f, 0.9f, 0.0f);
+    glClearColor(0.164, 0.223, 0.396, 0.0f);
 
     // Create shader programs.
     m_phongProgram = ResourceLoader::createShaderProgram(
@@ -281,14 +281,14 @@ void GLWidget::paintGL() {
     glUniformMatrix4fv(glGetUniformLocation(m_lavaProgram, "view"), 1, GL_FALSE, glm::value_ptr(m_view));
     glUniformMatrix4fv(glGetUniformLocation(m_lavaProgram, "projection"), 1, GL_FALSE, glm::value_ptr(m_projection));
     // Set color
-    glUniform3f(glGetUniformLocation(m_lavaProgram, "color"), 2.5f, 0.8f, 0);
+    glUniform3f(glGetUniformLocation(m_lavaProgram, "color"), 2.8f, 0.7f, 0);
     // Move lava down
-    glm::mat4 transMat  = glm::translate(glm::vec3(0, -0.5, 0));
+    glm::mat4 transMat  = glm::translate(glm::vec3(0, -0.4, 0));
     int modelUniLoc     = glGetUniformLocation(m_lavaProgram, "model");
     glUniformMatrix4fv(modelUniLoc, 1, GL_FALSE, glm::value_ptr(transMat));
     // Scale to be bigger and rotate
     glm::mat4 scaleMat  = glm::scale(glm::vec3(10.f));
-    glm::mat4 rotMat    = glm::rotate((float) M_PI_2, glm::vec3(1.0, 0, 0));
+    glm::mat4 rotMat    = glm::rotate(glm::radians(96.f), glm::vec3(1.0, 0, 0));
     glUniformMatrix4fv(modelUniLoc, 1, GL_FALSE, glm::value_ptr(rotMat * scaleMat + transMat));
     m_lava->draw();
     // Unbind shader program
@@ -444,6 +444,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event) {
 
 void GLWidget::wheelEvent(QWheelEvent *event) {
     m_zoom -= event->delta() / 100.f;
+    double temp = m_zoom;
+    m_zoom = std::min(temp, 12.0);
     rebuildMatrices();
 }
 
